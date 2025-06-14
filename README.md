@@ -1,61 +1,85 @@
-# 서울교통공사 유동인구 기반 상가 임대 분석
+# 지하철역 내부 상가 최적 입지 분석 프로젝트
 
-서울 지하철 역세권의 유동인구 및 상가 임대 데이터를 기반으로, 클러스터링을 통해 입지 추천 또는 상권 특성 분석을 수행하는 프로젝트입니다.
-
----
-
-## 데이터 구조 및 설명
-
-### 원본 데이터
-
-#### `Data/서울교통공사_일별통행통계_20241231.csv`
-- 서울교통공사에서 제공한 **2024년 일별 역별 유동인구 데이터**입니다.
-- 시간대별, 연령층별, 승하차 구분 및 승객 유형이 포함되어 있음
+본 레포지토리에서는 서울교통공사의 지하상가 임대정보와 유동인구 데이터를 활용하여 클러스터링 기법을 통해 지하철역별 상권 특성을 분석하고 최적의 상가 입지를 추천하는 머신러닝 프로젝트를 구현하였습니다.  
+K-Means, DBSCAN, Mean Shift 등 다양한 클러스터링 알고리즘을 적용하여 역별 상권 유형을 분류하고 업종별 성공 확률을 예측합니다.
 
 ---
 
-## 전처리 데이터 구조
+## 파일 구조 및 설명
 
-### `Result/Preprocessing/`
+### `main.ipynb`
 
-#### 월별 유동인구 원본 전처리 파일
-- 파일명: `population_2401.csv` ~ `population_2409.csv`, `population_2412.csv` (총 10개)
-- 처리 내용:
-  - 역명에서 괄호 제거
-  - 1시간 단위 시간대별 유동인구 합계 계산
-  - `승하차구분`, `승객유형` 기준 그룹화
-- 포함 컬럼:
-  - `역명`, `승하차구분`, `승객유형`, `05시`~`00시`, `합계`
-
-#### 월별 임대정보 전처리 파일
-- 파일명: `proprecessed_2401.csv` ~ `proprecessed_2412.csv` (10개)
-- 처리 내용:
-  - 역명 괄호 제거
-  - 공실 처리 및 `영업업종` 기준 그룹화
-  - 평균 임대료, 점포 수, 평균 면적 계산
-
-#### 월별 유동인구 최종 전처리 파일
-- 파일명: `Preprocessed_pop_2401.csv` ~ `Preprocessed_pop_2412.csv` (10개)
-- 처리 내용:
-  - 승객유형 재분류:  
-    - `어린이`, `청소년`, `중고생` → `미성년`  
-    - `일반` → `성인`  
-    - `우대권` → `노인`
-  - 시간대 재분류:  
-    - `05시~10시` → `아침`  
-    - `11시~17시` → `점심`  
-    - `18시~00시` → `저녁`
-  - 피벗 테이블로 재구성하여 연령층별, 시간대별 유동인구 추출
+- 전체 실험 흐름을 포함한 Python 기반 Jupyter Notebook입니다.
+- 데이터 로딩 → 전처리 → 클러스터링 분석 및 비교 → 특징 분석 → 결과 해석 순서로 구성되어 있습니다.
 
 ---
 
-## 전체 데이터 처리 흐름
+### Data/
 
-```mermaid
-graph TD
-    A[원본 유동인구 데이터 (2024)] --> B[월별 분할 및 1차 전처리]
-    B --> C[population_2401.csv ~ population_2412.csv]
-    C --> D[preprocessing_population() 함수 처리]
-    D --> E[Preprocessed_pop_2401.csv ~ 2412.csv]
-    E --> F[월별 통합 → population_month_sum.csv]
-    F --> G[임대정보와 병합 → merged.csv]
+- `서울교통공사_지하상가 임대정보_2024MMDD.csv`  
+  > 역명, 상가번호, 업종, 면적, 임대료 등 포함된 월별 임대 데이터입니다. (10개 파일)
+  
+- `서울교통공사_일별통행통계_20241231.csv`  
+  > 연령별(미성년, 성인, 노인, 외국인), 시간대별 월별 유동인구 데이터입니다. (용량이 커서 따로 제출하겠습니다)
+
+---
+
+## Result/ 폴더 구조
+
+### 🔹 Result/Preprocessing/
+
+> 데이터 전처리 및 통합 파일 저장
+
+- `proprecessed_2401.csv` ~ `proprecessed_2412.csv`: 월별 임대정보 원본 데이터를 전처리한 결과입니다.
+- `population_2401.csv` ~ `population_2412.csv`: 월별 유동인구 원본 데이터를 전처리한 결과입니다.
+- `Preprocessed_pop_2401.csv` ~ `Preprocessed_pop_2412.csv`: population_24XX.csv 파일을 preprocessing_population() 함수로 2차 전처리한 최종 결과입니다. 
+- `Rental_month_sum.csv`, `population_month_sum.csv`: 월별 통합 데이터셋입니다.
+- `merged.csv`: 임대정보 월별통합 데이터셋과 총유동인구를 포함한 데이터셋을 합친 결과입니다.
+
+---
+
+### 🔹 Result/Model/
+
+> 클러스터링 알고리즘 실행 결과 저장
+
+** K-Means 결과:**
+
+- `kmeans(total_population).csv`: 총 유동인구를 기준으로 한 K-Means 클러스터링 결과입니다.
+- `kmeans(adult_population).csv`: 성인 유동인구 패턴 기반 클러스터링 결과입니다.
+- `kmeans(minor_population).csv`: 미성년 유동인구 패턴 기반 클러스터링 결과입니다.
+- `kmeans(old_population).csv`: 노인 유동인구 패턴 기반 클러스터링 결과입니다.
+- `kmeans(foreign_population).csv`: 외국인 유동인구 패턴 기반 클러스터링 결과입니다.
+- `kmeans(density).csv`: 상가 밀도 기반 클러스터링 결과입니다.
+- `kmeans(potential).csv`: 상권 잠재력 지수 기반 클러스터링 결과입니다.
+
+** DBSCAN 결과:**
+
+- `dbscan(adult_population).csv` ~ `dbscan(potential).csv`: DBSCAN 알고리즘을 사용한 밀도 기반 클러스터링 결과입니다. (5개 파일)
+
+** Mean Shift 결과:**
+
+- `meanshift(total_population).csv` ~ `meanshift(potential).csv`: Mean Shift 알고리즘을 사용한 클러스터링 결과입니다. (7개 파일)
+
+---
+
+### 🔹 Result/Characteristic/
+
+> 클러스터별 특성 분석 결과
+
+- `total_population_characteristic.csv`: 총 유동인구 기준 클러스터별 특성 분석 결과입니다. 각 클러스터의 평균 유동인구, 주요 업종, 임대료 수준 등의 특성이 정리되어 있습니다.
+- `adult_population_characteristic.csv`: 인 유동인구 패턴에 따른 클러스터 특성 분석 결과입니다.
+- `minor_population_characteristic.csv`: 미성년 유동인구 패턴에 따른 클러스터 특성 분석 결과입니다.
+- `old_population_characteristic.csv`: 노인 유동인구 패턴에 따른 클러스터 특성 분석 결과입니다.
+- `foreign_population_characteristic.csv`: 외국인 유동인구 패턴에 따른 클러스터 특성 분석 결과입니다.
+- `density_characteristic.csv`: 상가 밀도 기준 클러스터별 특성 분석 결과입니다.
+- `potential_characteristic.csv`: 상권 잠재력 지수 기준 클러스터별 특성 분석 결과입니다.
+
+
+---
+
+### 🔹 Result/Suggestion/
+
+> 최종 입지 추천 결과 저장
+
+- `result_df.csv`: 클러스터링 결과와 역별 특성이 결합된 최종 분석 데이터입니다. 각 지하철역의 클러스터 소속 정보, 유동인구 특성, 상권 유형, 추천 업종 등이 종합적으로 정리되어 있습니다.
+- `location_suggestion.csv`: 입지 추천 시스템의 최종 결과 파일입니다. 각 지하철역별로 업종별 성공 확률 스코어, 상권 특성, 입지 추천 등급 등이 포함되어 있어 실제 상가 입지 선정 시 참고할 수 있는 실용적인 정보를 제공합니다.
