@@ -26,9 +26,9 @@ K-Means, DBSCAN, Mean Shift 등 다양한 클러스터링 알고리즘을 적용
 
 ## Result/ 폴더 구조
 
-### 🔹 Result/Preprocessing/
+### Result/Preprocessing/
 
---
+> 데이터 전처리 및 통합 파일 저장
 
 - `proprecessed_2401.csv` ~ `proprecessed_2412.csv`: 월별 임대정보 원본 데이터를 전처리한 결과입니다.
 - `population_2401.csv` ~ `population_2412.csv`: 월별 유동인구 원본 데이터를 전처리한 결과입니다.
@@ -38,7 +38,7 @@ K-Means, DBSCAN, Mean Shift 등 다양한 클러스터링 알고리즘을 적용
 
 ---
 
-### 🔹 Result/Model/
+### Result/Model/
 
 > 클러스터링 알고리즘 실행 결과 저장
 
@@ -62,7 +62,7 @@ K-Means, DBSCAN, Mean Shift 등 다양한 클러스터링 알고리즘을 적용
 
 ---
 
-### 🔹 Result/Characteristic/
+### Result/Characteristic/
 
 > 클러스터별 특성 분석 결과
 
@@ -77,7 +77,7 @@ K-Means, DBSCAN, Mean Shift 등 다양한 클러스터링 알고리즘을 적용
 
 ---
 
-### 🔹 Result/Suggestion/
+### Result/Suggestion/
 
 > 최종 입지 추천 결과 저장
 
