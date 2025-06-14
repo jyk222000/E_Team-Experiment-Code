@@ -14,7 +14,10 @@ K-Means, DBSCAN, Mean Shift 등 다양한 클러스터링 알고리즘을 적용
   - pandas
   - numpy
   - matplotlib
-    
+ 
+## 사용 방법
+
+- `서울교통공사_일별통행통계_20241231.csv`, `서울교통공사_지하상가 임대정보_2024MMDD.csv`, `main.ipynb` 을 같은 경로에 두고 실행
 ---
 
 ## 파일 구조 및 설명
